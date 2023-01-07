@@ -23,8 +23,6 @@ Test with newman
 import collection name "expenses.postman_collection_my.json" into your newman and run this collection
 
 
-**ข้อสุดท้าย ตัว echo ผมพยายามตอบ 401 แล้วครับใน code แต่มันผล response header ยังออกมาเป็น 400 
-
 
 Multistage Build
 =================
@@ -34,6 +32,7 @@ Dockerfile
 
 
 สุทธิพงศ์ สุวนิช
+sutthiphong2005@gmail.com
 
 ----------------------------------
 
