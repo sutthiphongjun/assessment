@@ -45,7 +45,7 @@ func TestCreateExpense(t *testing.T) {
 	h := handler{db}
 	c := e.NewContext(req, rec)
 
-	expected := "{\"id\":1,\"title\":\"strawberry smoothie\",\"amount\":79,\"note\":\"night market promotion discount 10 bath\",\"tags\":[\"food\",\"beverage\"]}"
+	expected := "{\"id\":1,\"title\":\"strawberry smoothie jun\",\"amount\":79,\"note\":\"night market promotion discount 10 bath\",\"tags\":[\"food\",\"beverage\"]}"
 
 	// Act
 	err = h.CreateExpense(c)
