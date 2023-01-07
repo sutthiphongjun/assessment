@@ -11,6 +11,7 @@ import (
 	"github.com/lib/pq"
 
 	"encoding/base64"
+	"errors"
 )
 
 type handler struct {
@@ -39,8 +40,7 @@ const (
 	password = "45678" //test basic authen purpose
 )
 
-func checkAuthorization(c echo.Context) error {
-
+func checkAuthorization(c echo.Context)  error {
 
 	auth := c.Request().Header.Get(echo.HeaderAuthorization)
 
@@ -51,7 +51,8 @@ func checkAuthorization(c echo.Context) error {
 		// instead should be treated as invalid client input
 		b, err := base64.StdEncoding.DecodeString(auth[l+1:])
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, Err{Message: err.Error()})
+			c.JSON(http.StatusBadRequest, Err{Message: err.Error()})
+			return errors.New("No have Authorization header")
 		}
 
 		cred := string(b)
@@ -61,24 +62,39 @@ func checkAuthorization(c echo.Context) error {
 				u := cred[:i]
 				p := cred[i+1:]
 
-				log.Printf("Username: password=%s:%s", username, password)
+				//log.Printf("Username: password=%s:%s", username, password)
 				//Just testing purpose, hardcode username and password 
 				if u != username && p != password {
 
-					return c.JSON(http.StatusForbidden, Err{Message: "You are not authorized to use this path"}) 
+					c.JSON(http.StatusForbidden, Err{Message: "You are not authorized to use this path"})
+					return errors.New("No have Authorization header")
 				}
 
 			}
 		}
+
+		//pass check
+	}else{
+		//error. No have Authorization header
+		c.JSON(http.StatusForbidden, Err{Message: "You are not authorized to use this path. Please input token in http header"})
+		return errors.New("No have Authorization header")
+
 	}
 
+	//pass check
+	log.Println("PASS check")
 	return nil
 
 }
 
 func (h *handler) CreateExpense(c echo.Context) error {
 
-	checkAuthorization(c)
+	resultcheck := checkAuthorization(c)
+
+	if resultcheck != nil {
+		log.Println("FOUND ERROR. EXIT")
+		return nil
+	}
 
 	exp := Expense{}
 	err := c.Bind(&exp)
@@ -98,4 +114,8 @@ func (h *handler) CreateExpense(c echo.Context) error {
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
 	c.Response().WriteHeader(http.StatusCreated)
 	return json.NewEncoder(c.Response()).Encode(exp)
+
+
+	
+
 }
