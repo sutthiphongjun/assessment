@@ -13,11 +13,9 @@ docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit -
 
 build and run docker based 
 ================
-export PORT=:2565
+chmod +x buildandrun.sh
 
-export DB_URL=
-
-./run.sh
+./buildandrun.sh
 
 
 Test with newman

@@ -52,7 +52,7 @@ func checkAuthorization(c echo.Context)  error {
 		// instead should be treated as invalid client input
 		b, err := base64.StdEncoding.DecodeString(auth[l+1:])
 		if err != nil {
-			c.JSON(http.StatusBadRequest, Err{Message: err.Error()})
+			c.JSON(http.StatusUnauthorized, Err{Message: err.Error()})
 			return errors.New("No have Authorization header")
 		}
 
@@ -67,7 +67,7 @@ func checkAuthorization(c echo.Context)  error {
 				//Just testing purpose, hardcode username and password 
 				if u != username && p != password {
 
-					c.JSON(http.StatusForbidden, Err{Message: "You are not authorized to use this path"})
+					c.JSON(http.StatusUnauthorized, Err{Message: "You are not authorized to use this path"})
 					return errors.New("No have Authorization header")
 				}
 
@@ -77,7 +77,7 @@ func checkAuthorization(c echo.Context)  error {
 		//pass check
 	}else{
 		//error. No have Authorization header
-		c.JSON(http.StatusForbidden, Err{Message: "You are not authorized to use this path. Please input token in http header"})
+		c.JSON(http.StatusUnauthorized, Err{Message: "You are not authorized to use this path. Please input token in http header"})
 		return errors.New("No have Authorization header")
 
 	}
