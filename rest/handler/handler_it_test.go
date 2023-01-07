@@ -138,7 +138,6 @@ func TestITGetExpenses(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-
 //EXP03
 func TestITPutExpense(t *testing.T) {
 
@@ -172,7 +171,7 @@ func TestITPutExpense(t *testing.T) {
 	assert.NoError(t, err)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	//apidesign:45678
-	req.Header.Set(echo.HeaderAuthorization, "Bearer YXBpZGVzaWduOjQ1Njc4")	
+	req.Header.Set(echo.HeaderAuthorization, "Bearer YXBpZGVzaWduOjQ1Njc4")
 	client := http.Client{}
 
 	// Act
@@ -196,8 +195,6 @@ func TestITPutExpense(t *testing.T) {
 	err = eh.Shutdown(ctx)
 	assert.NoError(t, err)
 }
-
-
 
 func TestITCreateExpenseID2(t *testing.T) {
 
@@ -232,7 +229,7 @@ func TestITCreateExpenseID2(t *testing.T) {
 	assert.NoError(t, err)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	//apidesign:45678
-	req.Header.Set(echo.HeaderAuthorization, "Bearer YXBpZGVzaWduOjQ1Njc4")	
+	req.Header.Set(echo.HeaderAuthorization, "Bearer YXBpZGVzaWduOjQ1Njc4")
 	client := http.Client{}
 
 	// Act
@@ -245,7 +242,6 @@ func TestITCreateExpenseID2(t *testing.T) {
 
 	// Assertions
 	expected := "{\"id\":2,\"title\":\"iPhone 14 Pro Max 1TB\",\"amount\":66900,\"note\":\"birthday gift from my love\",\"tags\":[\"gadget\"]}"
-
 
 	if assert.NoError(t, err) {
 		assert.Equal(t, http.StatusCreated, resp.StatusCode)
@@ -290,7 +286,7 @@ func TestITListExpenses(t *testing.T) {
 	assert.NoError(t, err)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	//apidesign:45678
-	req.Header.Set(echo.HeaderAuthorization, "Bearer YXBpZGVzaWduOjQ1Njc4")		
+	req.Header.Set(echo.HeaderAuthorization, "Bearer YXBpZGVzaWduOjQ1Njc4")
 	client := http.Client{}
 
 	// Act
@@ -314,5 +310,3 @@ func TestITListExpenses(t *testing.T) {
 	err = eh.Shutdown(ctx)
 	assert.NoError(t, err)
 }
-
-

@@ -59,7 +59,6 @@ func TestCreateExpense(t *testing.T) {
 	}
 }
 
-
 func TestGetExpenses(t *testing.T) {
 	// Arrange
 	e := echo.New()
@@ -70,13 +69,13 @@ func TestGetExpenses(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 
-	tags1 := []string{"food","beverage"}
+	tags1 := []string{"food", "beverage"}
 	//tagss := fmt.Sprintf("%v", pq.Array(tags))
 
 	//fmt.Printf("type of a is %T\n", tagss)
 	//fmt.Printf("%s", tagss)
 
-	expsMockRows := sqlmock.NewRows([]string{"id", "title", "amount", "note","tags"}).
+	expsMockRows := sqlmock.NewRows([]string{"id", "title", "amount", "note", "tags"}).
 		AddRow("1", "strawberry smoothie", "79", "night market promotion discount 10 bath", pq.Array(tags1))
 
 	db, mock, err := sqlmock.New()
@@ -101,7 +100,6 @@ func TestGetExpenses(t *testing.T) {
 		assert.Equal(t, expected, strings.TrimSpace(rec.Body.String()))
 	}
 }
-
 
 func TestUpdateExpense(t *testing.T) {
 
@@ -131,14 +129,11 @@ func TestUpdateExpense(t *testing.T) {
 		WithArgs(id, "apple smoothie", 89, "no discount", pq.Array(&tags)).
 		WillReturnResult(mockedRow)
 
-
-
 	h := handler{db}
 	c := e.NewContext(req, rec)
 	c.SetPath("/expenses/:id")
 	c.SetParamNames("id")
 	c.SetParamValues("1")
-
 
 	expected := "{\"id\":1,\"title\":\"apple smoothie\",\"amount\":89,\"note\":\"no discount\",\"tags\":[\"beverage\"]}"
 
@@ -149,10 +144,9 @@ func TestUpdateExpense(t *testing.T) {
 	if assert.NoError(t, err) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 		assert.Equal(t, expected, strings.TrimSpace(rec.Body.String()))
-	}	
+	}
 
 }
-
 
 func TestListExpenses(t *testing.T) {
 	// Arrange
@@ -167,8 +161,7 @@ func TestListExpenses(t *testing.T) {
 	tags1 := []string{"beverage"}
 	tags2 := []string{"gadget"}
 
-
-	expsMockRows := sqlmock.NewRows([]string{"id", "title", "amount", "note","tags"}).
+	expsMockRows := sqlmock.NewRows([]string{"id", "title", "amount", "note", "tags"}).
 		AddRow("1", "apple smoothie", "89", "no discount", pq.Array(tags1)).
 		AddRow("2", "iPhone 14 Pro Max 1TB", "66900", "birthday gift from my love", pq.Array(tags2))
 

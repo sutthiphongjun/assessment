@@ -25,7 +25,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	_ "github.com/lib/pq"
-  
+
 	"github.com/sutthiphongjun/assessment/rest/handler"
 )
 
@@ -70,7 +70,6 @@ func main() {
 		fmt.Println("Success create table expenses")
 	}
 
-
 	h := handler.NewApplication(db)
 
 	e := echo.New()
@@ -104,7 +103,4 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 
-
-
 }
-

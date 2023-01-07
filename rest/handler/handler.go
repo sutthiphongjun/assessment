@@ -36,12 +36,12 @@ type Err struct {
 }
 
 const (
-	bearer = "bearer"
+	bearer   = "bearer"
 	username = "apidesign" //test basic authen purpose
-	password = "45678" //test basic authen purpose
+	password = "45678"     //test basic authen purpose
 )
 
-func checkAuthorization(c echo.Context)  error {
+func checkAuthorization(c echo.Context) error {
 
 	auth := c.Request().Header.Get(echo.HeaderAuthorization)
 
@@ -61,7 +61,6 @@ func checkAuthorization(c echo.Context)  error {
 
 			//return errors.New("No have Authorization header")
 
-
 		}
 
 		cred := string(b)
@@ -72,7 +71,7 @@ func checkAuthorization(c echo.Context)  error {
 				p := cred[i+1:]
 
 				//log.Printf("Username: password=%s:%s", username, password)
-				//Just testing purpose, hardcode username and password 
+				//Just testing purpose, hardcode username and password
 				if u != username && p != password {
 
 					c.JSON(http.StatusUnauthorized, Err{Message: "You are not authorized to use this path"})
@@ -90,7 +89,7 @@ func checkAuthorization(c echo.Context)  error {
 		}
 
 		//pass check
-	}else{
+	} else {
 		//error. No have Authorization header
 		c.JSON(http.StatusUnauthorized, Err{Message: "You are not authorized to use this path. Please input token in http header"})
 		return errors.New("No have Authorization header")
@@ -131,9 +130,6 @@ func (h *handler) CreateExpense(c echo.Context) error {
 	c.Response().WriteHeader(http.StatusCreated)
 	return json.NewEncoder(c.Response()).Encode(exp)
 
-
-	
-
 }
 
 func (h *handler) GetExpenses(c echo.Context) error {
@@ -149,7 +145,7 @@ func (h *handler) GetExpenses(c echo.Context) error {
 	//id MUST BE INTEGER
 	_, err_int := strconv.Atoi(uid)
 	if err_int != nil {
-		return c.JSON(http.StatusBadRequest, Err{Message: err_int.Error()})	
+		return c.JSON(http.StatusBadRequest, Err{Message: err_int.Error()})
 	}
 
 	rows, err := h.DB.Query("SELECT * FROM expenses WHERE id=" + uid)
@@ -163,14 +159,13 @@ func (h *handler) GetExpenses(c echo.Context) error {
 
 	var id, amount int
 	var title, note string
-	var tags []string	
+	var tags []string
 
 	if rows.Next() {
 		err := rows.Scan(&id, &title, &amount, &note, pq.Array(&tags))
 		if err != nil {
 			log.Fatal(err)
 		}
-
 
 		n.ID = id
 		n.Title = title
@@ -185,7 +180,7 @@ func (h *handler) GetExpenses(c echo.Context) error {
 }
 
 func (h *handler) UpdateExpense(c echo.Context) error {
-	
+
 	resultcheck := checkAuthorization(c)
 	if resultcheck != nil {
 		log.Println("FOUND ERROR. EXIT")
@@ -197,11 +192,12 @@ func (h *handler) UpdateExpense(c echo.Context) error {
 	//id MUST BE INTEGER
 	eid_int, err_int := strconv.Atoi(eid)
 	if err_int != nil {
-		return c.JSON(http.StatusBadRequest, Err{Message: err_int.Error()})	
+		return c.JSON(http.StatusBadRequest, Err{Message: err_int.Error()})
 	}
 
 	exp := Expense{}
-	err := c.Bind(&exp); if err != nil {
+	err := c.Bind(&exp)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, Err{Message: err.Error()})
 	}
 
@@ -221,10 +217,8 @@ func (h *handler) UpdateExpense(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
 	}
 
-
 	return c.JSON(http.StatusOK, exp)
 }
-
 
 func (h *handler) ListExpenses(c echo.Context) error {
 
@@ -233,7 +227,6 @@ func (h *handler) ListExpenses(c echo.Context) error {
 		log.Println("FOUND ERROR. EXIT")
 		return nil
 	}
-
 
 	rows, err := h.DB.Query("SELECT * FROM expenses")
 	if err != nil {
@@ -246,7 +239,7 @@ func (h *handler) ListExpenses(c echo.Context) error {
 
 	var id, amount int
 	var title, note string
-	var tags []string	
+	var tags []string
 
 	for rows.Next() {
 		err := rows.Scan(&id, &title, &amount, &note, pq.Array(&tags))
@@ -254,7 +247,6 @@ func (h *handler) ListExpenses(c echo.Context) error {
 			log.Fatal(err)
 			return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
 		}
-
 
 		n.ID = id
 		n.Title = title
