@@ -1,7 +1,8 @@
 
 unit test
 ==========
-go run -v -tags=unit ./...
+
+go test -v --tags=unit github.com/sutthiphongjun/assessment/rest/handler
 
 
 integration test (run tear down every time you woule like to test integration test)
