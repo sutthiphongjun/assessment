@@ -27,6 +27,8 @@ func TestCreateExpense(t *testing.T) {
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/expenses", strings.NewReader(expenseJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	//apidesign:45678
+	req.Header.Set(echo.HeaderAuthorization, "Bearer YXBpZGVzaWduOjQ1Njc4")
 	rec := httptest.NewRecorder()
 
 	tags1 := []string{"food", "beverage"}
