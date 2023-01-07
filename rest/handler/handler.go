@@ -52,8 +52,16 @@ func checkAuthorization(c echo.Context)  error {
 		// instead should be treated as invalid client input
 		b, err := base64.StdEncoding.DecodeString(auth[l+1:])
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, Err{Message: err.Error()})
+			//c.JSON(http.StatusUnauthorized, Err{Message: err.Error()})
+			//return errors.New("No have Authorization header")
+
+			c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
+			c.Response().WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(c.Response()).Encode(Err{Message: err.Error()})
+
 			return errors.New("No have Authorization header")
+
+
 		}
 
 		cred := string(b)
@@ -67,8 +75,15 @@ func checkAuthorization(c echo.Context)  error {
 				//Just testing purpose, hardcode username and password 
 				if u != username && p != password {
 
-					c.JSON(http.StatusUnauthorized, Err{Message: "You are not authorized to use this path"})
+					//c.JSON(http.StatusUnauthorized, Err{Message: "You are not authorized to use this path"})
+					//return errors.New("No have Authorization header")
+
+					c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
+					c.Response().WriteHeader(http.StatusUnauthorized)
+					json.NewEncoder(c.Response()).Encode(Err{Message: "You are not authorized to use this path"})
+
 					return errors.New("No have Authorization header")
+
 				}
 
 			}
