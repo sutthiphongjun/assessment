@@ -58,3 +58,46 @@ func TestCreateExpense(t *testing.T) {
 		assert.Equal(t, expected, strings.TrimSpace(rec.Body.String()))
 	}
 }
+
+
+func TestGetExpenses(t *testing.T) {
+	// Arrange
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/expenses", strings.NewReader(""))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	//apidesign:45678
+	req.Header.Set(echo.HeaderAuthorization, "Bearer YXBpZGVzaWduOjQ1Njc4")
+
+	rec := httptest.NewRecorder()
+
+	tags1 := []string{"food","beverage"}
+	//tagss := fmt.Sprintf("%v", pq.Array(tags))
+
+	//fmt.Printf("type of a is %T\n", tagss)
+	//fmt.Printf("%s", tagss)
+
+	expsMockRows := sqlmock.NewRows([]string{"id", "title", "amount", "note","tags"}).
+		AddRow("1", "strawberry smoothie", "79", "night market promotion discount 10 bath", pq.Array(tags1))
+
+	db, mock, err := sqlmock.New()
+	mock.ExpectQuery("SELECT (.+) FROM expenses WHERE id=1").WillReturnRows(expsMockRows)
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	h := handler{db}
+	c := e.NewContext(req, rec)
+	c.SetPath("/expenses/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	expected := "{\"id\":1,\"title\":\"strawberry smoothie\",\"amount\":79,\"note\":\"night market promotion discount 10 bath\",\"tags\":[\"food\",\"beverage\"]}"
+
+	// Act
+	err = h.GetExpenses(c)
+
+	// Assertions
+	if assert.NoError(t, err) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, expected, strings.TrimSpace(rec.Body.String()))
+	}
+}
