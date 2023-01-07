@@ -209,3 +209,46 @@ func (h *handler) UpdateExpense(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, exp)
 }
+
+
+func (h *handler) ListExpenses(c echo.Context) error {
+
+	resultcheck := checkAuthorization(c)
+	if resultcheck != nil {
+		log.Println("FOUND ERROR. EXIT")
+		return nil
+	}
+
+
+	rows, err := h.DB.Query("SELECT * FROM expenses")
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
+	}
+	defer rows.Close()
+
+	var nn = []Expense{}
+	var n = Expense{}
+
+	var id, amount int
+	var title, note string
+	var tags []string	
+
+	for rows.Next() {
+		err := rows.Scan(&id, &title, &amount, &note, pq.Array(&tags))
+		if err != nil {
+			log.Fatal(err)
+			return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
+		}
+
+
+		n.ID = id
+		n.Title = title
+		n.Amount = amount
+		n.Note = note
+		n.Tags = tags
+
+		nn = append(nn, n)
+	}
+
+	return c.JSON(http.StatusOK, nn)
+}

@@ -153,3 +153,40 @@ func TestUpdateExpense(t *testing.T) {
 
 }
 
+
+func TestListExpenses(t *testing.T) {
+	// Arrange
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/expenses", strings.NewReader(""))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	//apidesign:45678
+	req.Header.Set(echo.HeaderAuthorization, "Bearer YXBpZGVzaWduOjQ1Njc4")
+
+	rec := httptest.NewRecorder()
+
+	tags1 := []string{"beverage"}
+	tags2 := []string{"gadget"}
+
+
+	expsMockRows := sqlmock.NewRows([]string{"id", "title", "amount", "note","tags"}).
+		AddRow("1", "apple smoothie", "89", "no discount", pq.Array(tags1)).
+		AddRow("2", "iPhone 14 Pro Max 1TB", "66900", "birthday gift from my love", pq.Array(tags2))
+
+	db, mock, err := sqlmock.New()
+	mock.ExpectQuery("SELECT (.+) FROM expenses").WillReturnRows(expsMockRows)
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	h := handler{db}
+	c := e.NewContext(req, rec)
+	expected := "[{\"id\":1,\"title\":\"apple smoothie\",\"amount\":89,\"note\":\"no discount\",\"tags\":[\"beverage\"]},{\"id\":2,\"title\":\"iPhone 14 Pro Max 1TB\",\"amount\":66900,\"note\":\"birthday gift from my love\",\"tags\":[\"gadget\"]}]"
+
+	// Act
+	err = h.ListExpenses(c)
+
+	// Assertions
+	if assert.NoError(t, err) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, expected, strings.TrimSpace(rec.Body.String()))
+	}
+}
