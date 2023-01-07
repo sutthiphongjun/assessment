@@ -169,3 +169,43 @@ func (h *handler) GetExpenses(c echo.Context) error {
 	return c.JSON(http.StatusOK, n)
 }
 
+func (h *handler) UpdateExpense(c echo.Context) error {
+	
+	resultcheck := checkAuthorization(c)
+	if resultcheck != nil {
+		log.Println("FOUND ERROR. EXIT")
+		return nil
+	}
+
+	eid := c.Param("id")
+
+	//id MUST BE INTEGER
+	eid_int, err_int := strconv.Atoi(eid)
+	if err_int != nil {
+		return c.JSON(http.StatusBadRequest, Err{Message: err_int.Error()})	
+	}
+
+	exp := Expense{}
+	err := c.Bind(&exp); if err != nil {
+		return c.JSON(http.StatusBadRequest, Err{Message: err.Error()})
+	}
+
+	pgTagsarr := pq.Array(exp.Tags)
+
+	stmtupdate, errupdate := h.DB.Prepare("UPDATE expenses SET title=$2, amount=$3, note=$4, tags=$5 WHERE id=$1")
+
+	if errupdate != nil {
+		log.Fatal("can't prepare statment update", errupdate)
+		return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
+	}
+
+	exp.ID = eid_int
+
+	if _, err := stmtupdate.Exec(exp.ID, exp.Title, exp.Amount, exp.Note, pgTagsarr); err != nil {
+		log.Fatal("error execute update ", err)
+		return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
+	}
+
+
+	return c.JSON(http.StatusOK, exp)
+}
