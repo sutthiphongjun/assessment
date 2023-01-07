@@ -21,7 +21,7 @@ chmod +x buildandrun.sh
 
 Test with newman
 =================
-import collection name "expenses.postman_collection_my.json" into your newman and run this collection
+import collection name "expenses-sutthiphongjun.postman_collection.json" into your newman and run this collection
 
 
 
