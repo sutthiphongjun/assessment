@@ -63,7 +63,7 @@ func TestCreateExpense(t *testing.T) {
 func TestGetExpenses(t *testing.T) {
 	// Arrange
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/expenses", strings.NewReader(""))
+	req := httptest.NewRequest(http.MethodGet, "/expenses/1", strings.NewReader(""))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	//apidesign:45678
 	req.Header.Set(echo.HeaderAuthorization, "Bearer YXBpZGVzaWduOjQ1Njc4")
@@ -101,3 +101,55 @@ func TestGetExpenses(t *testing.T) {
 		assert.Equal(t, expected, strings.TrimSpace(rec.Body.String()))
 	}
 }
+
+
+func TestUpdateExpense(t *testing.T) {
+
+	//json input
+	expenseJSON := `{"title": "apple smoothie","amount": 89,"note": "no discount", "tags": ["beverage"]}`
+
+	// Arrange
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPut, "/expenses/1", strings.NewReader(expenseJSON))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	//apidesign:45678
+	req.Header.Set(echo.HeaderAuthorization, "Bearer YXBpZGVzaWduOjQ1Njc4")
+
+	rec := httptest.NewRecorder()
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	id := 1
+	tags := []string{"beverage"}
+	mockedSql := "UPDATE expenses SET title=$2, amount=$3, note=$4, tags=$5 WHERE id=$1"
+	mockedRow := sqlmock.NewResult(1, 1)
+
+	mock.ExpectPrepare(regexp.QuoteMeta(mockedSql)).ExpectExec().
+		WithArgs(id, "apple smoothie", 89, "no discount", pq.Array(&tags)).
+		WillReturnResult(mockedRow)
+
+
+
+	h := handler{db}
+	c := e.NewContext(req, rec)
+	c.SetPath("/expenses/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+
+	expected := "{\"id\":1,\"title\":\"apple smoothie\",\"amount\":89,\"note\":\"no discount\",\"tags\":[\"beverage\"]}"
+
+	// Act
+	err = h.UpdateExpense(c)
+
+	// Assertions
+	if assert.NoError(t, err) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, expected, strings.TrimSpace(rec.Body.String()))
+	}	
+
+}
+
