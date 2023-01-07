@@ -1,3 +1,32 @@
+
+unit test
+==========
+go run -v -tags=unit ./...
+
+integration test (run tear down every time you woule like to test integration test)
+============
+docker-compose -f docker-compose.test.yml down
+docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from it_tests
+
+build and run docker based 
+================
+export PORT=:2565
+export DB_URL=
+./run.sh
+
+
+Test with newman
+=================
+
+
+
+
+
+
+
+
+----------------------------------
+
 # Prerequisites
 * โปรเจคตั้งต้นคือ[โปรเจคนี้](https://github.com/KKGo-Software-engineering/assessment)
 * กำหนดให้ส่งลิ้งค์คำตอบคือ github repository ที่เก็บโค้ดของคุณ `https://github.com/<your github name>/assessment`
